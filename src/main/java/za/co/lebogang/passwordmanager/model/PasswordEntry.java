@@ -36,30 +36,30 @@ public class PasswordEntry {
         return serviceName;
     }
 
-    public String setServiceName(String serviceName) {
-        return this.serviceName = serviceName;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public String getUsername() {
         return username;
     }
-    public String setUsername(String username) {
-       return this.username = username;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
-    public String setPassword(String password) {
-        return this.password = password;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 
     public String getNotes() {
         return notes;
     }
-    public String setNotes(String notes) {
-        return this.notes = notes;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
 
