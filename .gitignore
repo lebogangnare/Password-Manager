@@ -1,0 +1,20 @@
+# Maven build output
+target/
+
+# Compiled class files
+*.class
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Runtime data — never commit real stored credentials
+passwords.json
+
+# OS files
+.DS_Store
+Thumbs.db
