@@ -1,31 +1,48 @@
 package za.co.lebogang.passwordmanager.model;
 
-
 import java.util.UUID;
 
 public class PasswordEntry {
+
+    public static final String DEFAULT_CATEGORY = "General";
 
     private final String id;
     private String serviceName;
     private String username;
     private String password;
     private String notes;
+    private String category;
 
-
+    // New entry with default category
     public PasswordEntry(String serviceName, String username, String password, String notes) {
         this.id = UUID.randomUUID().toString();
         this.serviceName = serviceName;
         this.username = username;
         this.password = password;
         this.notes = notes;
+        this.category = DEFAULT_CATEGORY;
     }
 
-    public PasswordEntry(String id, String serviceName, String username, String password, String notes){
+    // New entry with specified category
+    public PasswordEntry(String serviceName, String username, String password,
+                          String notes, String category) {
+        this.id = UUID.randomUUID().toString();
+        this.serviceName = serviceName;
+        this.username = username;
+        this.password = password;
+        this.notes = notes;
+        setCategory(category);
+    }
+
+    // Reconstruct an entry from storage
+    public PasswordEntry(String id, String serviceName, String username,
+                          String password, String notes, String category) {
         this.id = id;
         this.serviceName = serviceName;
         this.username = username;
         this.password = password;
         this.notes = notes;
+        setCategory(category);
     }
 
     public String getId() {
@@ -43,6 +60,7 @@ public class PasswordEntry {
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -50,26 +68,40 @@ public class PasswordEntry {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
-
     public String getNotes() {
         return notes;
     }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        if (category == null || category.isBlank()) {
+            this.category = DEFAULT_CATEGORY;
+        } else {
+            this.category = category;
+        }
+    }
 
     @Override
     public String toString() {
         return String.format(
-                "[%s] %-15s user: %-25s pass: ********",
+                "[%s] %-15s category: %-12s user: %-25s pass: ********",
                 id,
                 serviceName,
+                category,
                 username
         );
     }
 }
+
