@@ -10,21 +10,27 @@ public class PasswordManager {
 
     private final List<PasswordEntry> entries = new ArrayList<>();
 
-
-    public PasswordEntry addEntry(String serviceName, String username, String password, String notes) {
-
-        PasswordEntry entry = new PasswordEntry(serviceName, username, password, notes);
+    public PasswordEntry addEntry(
+            String serviceName,
+            String username,
+            String password,
+            String notes
+    ) {
+        PasswordEntry entry = new PasswordEntry(
+                serviceName,
+                username,
+                password,
+                notes
+        );
 
         entries.add(entry);
 
         return entry;
     }
 
-
     public List<PasswordEntry> getAllEntries() {
         return new ArrayList<>(entries);
     }
-
 
     public List<PasswordEntry> search(String keyword) {
 
@@ -46,6 +52,10 @@ public class PasswordManager {
 
     public boolean deleteEntry(String id) {
         return entries.removeIf(entry -> entry.getId().equals(id));
+    }
+
+    public void loadEntry(PasswordEntry entry) {
+        entries.add(entry);
     }
 
     public Optional<PasswordEntry> findById(String id) {
