@@ -20,6 +20,7 @@ public class Main {
         PasswordManager manager = new PasswordManager();
 
         try {
+
             if (!vaultStorage.vaultExists()) {
 
                 System.out.println("No vault found.");
@@ -65,14 +66,18 @@ public class Main {
 
         while (true) {
 
-            char[] password = readPassword("Create master password: ");
+            char[] password = readPassword(
+                    "Create master password: "
+            );
 
             if (password == null) {
-                System.out.println("Unable to read password.");
-                return new char[0];
+                throw new IllegalStateException(
+                        "Unable to read master password."
+                );
             }
 
             if (password.length < MIN_PASSWORD_LENGTH) {
+
                 System.out.println(
                         "Password must be at least "
                                 + MIN_PASSWORD_LENGTH
@@ -88,9 +93,12 @@ public class Main {
             );
 
             if (confirmation == null) {
+
                 Arrays.fill(password, ' ');
-                System.out.println("Unable to read password.");
-                return new char[0];
+
+                throw new IllegalStateException(
+                        "Unable to read password confirmation."
+                );
             }
 
             if (!Arrays.equals(password, confirmation)) {
@@ -113,7 +121,11 @@ public class Main {
             VaultStorage vaultStorage
     ) {
 
-        for (int attempt = 1; attempt <= MAX_UNLOCK_ATTEMPTS; attempt++) {
+        for (
+                int attempt = 1;
+                attempt <= MAX_UNLOCK_ATTEMPTS;
+                attempt++
+        ) {
 
             System.out.println(
                     "Unlock attempt "
@@ -127,7 +139,11 @@ public class Main {
             );
 
             if (password == null) {
-                System.out.println("Unable to read password.");
+
+                System.out.println(
+                        "Unable to read password."
+                );
+
                 return null;
             }
 
@@ -137,10 +153,14 @@ public class Main {
 
             } catch (IllegalArgumentException e) {
 
-                System.out.println("Incorrect master password.");
+                System.out.println(
+                        "Incorrect master password."
+                );
 
                 if (attempt < MAX_UNLOCK_ATTEMPTS) {
-                    System.out.println("Please try again.");
+                    System.out.println(
+                            "Please try again."
+                    );
                 }
 
             } catch (Exception e) {
@@ -166,15 +186,13 @@ public class Main {
         Console console = System.console();
 
         if (console != null) {
-            char[] password = console.readPassword(prompt);
-            return password;
+            return console.readPassword(prompt);
         }
 
-        // Fallback for IntelliJ/IDEs where System.console()
-        // may return null.
         System.out.print(prompt);
 
         Scanner scanner = new Scanner(System.in);
+
         return scanner.nextLine().toCharArray();
     }
 }
