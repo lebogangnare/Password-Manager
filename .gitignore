@@ -18,3 +18,4 @@ passwords.json
 # OS files
 .DS_Store
 Thumbs.db
+vault.json
