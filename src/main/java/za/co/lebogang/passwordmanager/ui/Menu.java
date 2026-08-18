@@ -2,21 +2,33 @@ package za.co.lebogang.passwordmanager.ui;
 
 import za.co.lebogang.passwordmanager.model.PasswordEntry;
 import za.co.lebogang.passwordmanager.service.PasswordManager;
-import za.co.lebogang.passwordmanager.storage.FileService;
+import za.co.lebogang.passwordmanager.storage.VaultStorage;
+import za.co.lebogang.passwordmanager.util.PasswordGenerator;
+import za.co.lebogang.passwordmanager.util.PasswordStrengthChecker;
 
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
 
     private final PasswordManager manager;
-    private final FileService fileService;
+    private final VaultStorage vaultStorage;
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final PasswordGenerator passwordGenerator = new PasswordGenerator();
+    private final PasswordStrengthChecker strengthChecker =
+            new PasswordStrengthChecker();
 
-    public Menu(PasswordManager manager, FileService fileService) {
+    private final Scanner scanner;
+
+    public Menu(
+            PasswordManager manager,
+            VaultStorage vaultStorage,
+            Scanner scanner
+    ) {
         this.manager = manager;
-        this.fileService = fileService;
+        this.vaultStorage = vaultStorage;
+        this.scanner = scanner;
     }
 
     public void start() {
@@ -30,7 +42,9 @@ public class Menu {
             System.out.println("2. View all entries");
             System.out.println("3. Search entries");
             System.out.println("4. Delete entry");
-            System.out.println("5. Exit");
+            System.out.println("5. Generate a password");
+            System.out.println("6. Check a password's strength");
+            System.out.println("7. Exit");
             System.out.print("Choose an option: ");
 
             String choice = scanner.nextLine();
@@ -54,6 +68,14 @@ public class Menu {
                     break;
 
                 case "5":
+                    handleGeneratePassword();
+                    break;
+
+                case "6":
+                    handleCheckStrength();
+                    break;
+
+                case "7":
                     running = false;
                     System.out.println("Goodbye!");
                     break;
@@ -72,8 +94,15 @@ public class Menu {
         System.out.print("Username: ");
         String username = scanner.nextLine();
 
-        System.out.print("Password: ");
+        System.out.print(
+                "Password (leave blank to auto-generate): "
+        );
         String password = scanner.nextLine();
+
+        if (password.isBlank()) {
+            password = passwordGenerator.generateDefault();
+            System.out.println("Generated password: " + password);
+        }
 
         System.out.print("Notes: ");
         String notes = scanner.nextLine();
@@ -85,7 +114,13 @@ public class Menu {
                 notes
         );
 
-        fileService.save(manager.getAllEntries());
+        try {
+            vaultStorage.save(manager.getAllEntries());
+        } catch (GeneralSecurityException e) {
+            System.out.println(
+                    "Error saving vault: " + e.getMessage()
+            );
+        }
 
         System.out.println("Entry added successfully!");
         System.out.println(entry);
@@ -132,10 +167,36 @@ public class Menu {
         boolean deleted = manager.deleteEntry(id);
 
         if (deleted) {
-            fileService.save(manager.getAllEntries());
-            System.out.println("Entry deleted.");
+            try {
+                vaultStorage.save(manager.getAllEntries());
+                System.out.println("Entry deleted.");
+            } catch (GeneralSecurityException e) {
+                System.out.println(
+                        "Error saving vault: " + e.getMessage()
+                );
+            }
         } else {
             System.out.println("No entry found with that ID.");
         }
+    }
+
+    private void handleGeneratePassword() {
+
+        String password = passwordGenerator.generateDefault();
+
+        System.out.println("Generated password: " + password);
+        System.out.println(
+                "Strength: " + strengthChecker.check(password)
+        );
+    }
+
+    private void handleCheckStrength() {
+
+        System.out.print("Enter a password to check: ");
+        String password = scanner.nextLine();
+
+        System.out.println(
+                "Strength: " + strengthChecker.check(password)
+        );
     }
 }

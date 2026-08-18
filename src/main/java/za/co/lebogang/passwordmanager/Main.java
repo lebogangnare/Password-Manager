@@ -3,6 +3,7 @@ package za.co.lebogang.passwordmanager;
 import za.co.lebogang.passwordmanager.model.PasswordEntry;
 import za.co.lebogang.passwordmanager.service.PasswordManager;
 import za.co.lebogang.passwordmanager.storage.VaultStorage;
+import za.co.lebogang.passwordmanager.ui.Menu;
 
 import java.io.Console;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public class Main {
 
         VaultStorage vaultStorage = new VaultStorage();
         PasswordManager manager = new PasswordManager();
+        Scanner scanner = new Scanner(System.in);
 
         try {
 
@@ -26,7 +28,7 @@ public class Main {
                 System.out.println("No vault found.");
                 System.out.println("Let's create your password vault.");
 
-                char[] masterPassword = promptForNewPassword();
+                char[] masterPassword = promptForNewPassword(scanner);
 
                 try {
                     vaultStorage.createVault(masterPassword);
@@ -39,7 +41,8 @@ public class Main {
 
                 System.out.println("Password vault found.");
 
-                List<PasswordEntry> entries = unlockVault(vaultStorage);
+                List<PasswordEntry> entries =
+                        unlockVault(vaultStorage, scanner);
 
                 if (entries == null) {
                     System.out.println("Too many failed attempts.");
@@ -55,19 +58,19 @@ public class Main {
                 System.out.println("Loaded " + entries.size() + " entries.");
             }
 
-            // Menu will be connected here in a later step.
+            new Menu(manager, vaultStorage, scanner).start();
 
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
 
-    private static char[] promptForNewPassword() {
+    private static char[] promptForNewPassword(Scanner scanner) {
 
         while (true) {
 
             char[] password = readPassword(
-                    "Create master password: "
+                    scanner, "Create master password: "
             );
 
             if (password == null) {
@@ -89,7 +92,7 @@ public class Main {
             }
 
             char[] confirmation = readPassword(
-                    "Confirm master password: "
+                    scanner, "Confirm master password: "
             );
 
             if (confirmation == null) {
@@ -118,7 +121,8 @@ public class Main {
     }
 
     private static List<PasswordEntry> unlockVault(
-            VaultStorage vaultStorage
+            VaultStorage vaultStorage,
+            Scanner scanner
     ) {
 
         for (
@@ -135,7 +139,7 @@ public class Main {
             );
 
             char[] password = readPassword(
-                    "Master password: "
+                    scanner, "Master password: "
             );
 
             if (password == null) {
@@ -181,7 +185,10 @@ public class Main {
         return null;
     }
 
-    private static char[] readPassword(String prompt) {
+    private static char[] readPassword(
+            Scanner scanner,
+            String prompt
+    ) {
 
         Console console = System.console();
 
@@ -190,8 +197,6 @@ public class Main {
         }
 
         System.out.print(prompt);
-
-        Scanner scanner = new Scanner(System.in);
 
         return scanner.nextLine().toCharArray();
     }
